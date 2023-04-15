@@ -10,6 +10,7 @@ N = 1024;
 t = linspace(0, (N - 1) / fs, N);
 
 theta = [-10, 20, 50, 70, 80] / 180 * pi;
+src_num = length(theta);
 f = [1, 3, 5, 6, 7] * 1e6;
 f0 = 500e6;
 lambda = c / f0;
@@ -54,6 +55,7 @@ plot(theta_search_degree_capon, P_capon);
 hold on;
 scatter(detect_theta_degree_capon, P_capon(peak_idx));
 xlim([-90, 90]);
+title("Capon");
 
 % MUSIC
 Rxx = (x * x') / N;
@@ -85,19 +87,18 @@ plot(theta_search_degree_music, P_music);
 hold on;
 scatter(detect_theta_degree_music, P_music(peak_idx));
 xlim([-90, 90]);
+title("MUSIC")
 
 % ESPRIT
 [U, D, V] = svd(Rxx);
-Us = U(:, 1: 5);
+Us = U(:, 1: src_num);
 Usx = Us(1: M - 1,:); 
 Usy = Us(2: M,:);
 Psi = Usx \ Usy;
-[~, phi] = eig(Psi);
-phi = diag(phi);
+phi = eig(Psi);
 omega = angle(phi);
 detect_theta_degree_esprit = -asin(omega / 2 / pi / dist * lambda) / pi * 180;
 subplot(3, 1, 3);
-plot_esprit_x = cos(detect_theta_degree_esprit / 180 * pi);
-plot_esprit_y = sin(detect_theta_degree_esprit / 180 * pi);
-scatter(plot_esprit_x, plot_esprit_y);
-xlim([-1, 1]);
+polarscatter(detect_theta_degree_esprit / 180 * pi, ones(1, length(detect_theta_degree_esprit)), 'red');
+rlim([0, 1]);
+title("ESPRIT");
